@@ -2,8 +2,6 @@
 {
     padding: 0;
     margin: 0;
-    font-size: 16px;
-    font-family: 'dk_liquid_embraceregular';
 }
 
 body
@@ -22,16 +20,4 @@ canvas
     width: 100%;
     height: 100vh;
     margin: 0 auto;
-}
-
-/*
-Emoji Symbols Font (c)blockworks - Kenichi Kaneko
-http://emojisymbols.com/
-*/
-
-@font-face {
-    font-family: 'EmojiSymbols';
-    src: url('fonts/EmojiSymbols-Regular.woff') format('woff');
-    text-decoration: none;
-    font-style: normal;
 }
