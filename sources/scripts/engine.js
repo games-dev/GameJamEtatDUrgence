@@ -20,14 +20,15 @@
 			this.vectorTarget = Tool.vec2(0,0);
 
 
-			for (var i = 0; i < 50; i++)
+			for (var i = 0; i < 200; i++)
 			{
-				var boid = PIXI.Sprite.fromImage('../images/toto.png');
+				var boid = PIXI.Sprite.fromFrame(Settings.GetRandomCharacter());
 				var seed = Math.random();
 
 				boid.anchor.set(0.5, 1)
-				boid.scale.set(0.25 + 0.25 * seed)
-				boid.size = (0.5 + 0.5 * seed) * 96
+				boid.scale.set(0.2 + 0.1 * seed)
+				boid.initialScale = boid.scale.x
+				boid.size = (0.5 + 0.5 * seed) * 32
 				boid.target = Tool.vec2(window.innerWidth / 2, window.innerHeight / 2)
 
 				var velocityAngle = Math.random() * Math.PI * 2
@@ -37,25 +38,34 @@
 				boid.friction = Settings.DEFAULT_FRICTION + Math.random() * 0.05
 				boid.frictionCollision = Settings.DEFAULT_FRICTION_COLLISION
 
-				boid.targetScale = Settings.DEFAULT_TARGET_SCALE + Math.random() * 0.1
-				boid.avoidScale = Settings.DEFAULT_AVOID_SCALE + Math.random() * 1
+				boid.targetScale = Settings.DEFAULT_TARGET_SCALE// + Math.random() * 0.1
+				boid.avoidScale = Settings.DEFAULT_AVOID_SCALE// + Math.random() * 1
 				boid.nearScale = Settings.DEFAULT_NEAR_SCALE
 				boid.globalScale = Settings.DEFAULT_GLOBAL_SCALE
 
 				boid.index = i;
 
-				var self = boid;
+				boid.speedWithSize = boid.speed / Math.max(1, boid.size);
 
 				boid.move = function(moveX, moveY)
 				{
 					this.velocity.x += moveX
 					this.velocity.y += moveY
 
-					this.x += this.velocity.x * this.speed / Math.max(1, this.size)
-					this.y += this.velocity.y * this.speed / Math.max(1, this.size)
+					this.x += this.velocity.x * boid.speedWithSize
+					this.y += this.velocity.y * boid.speedWithSize
 
 					this.velocity.x *= this.friction
 					this.velocity.y *= this.friction
+
+					// if ((this.velocity.x * boid.speedWithSize > 5 && this.scale.x > 1)  || (this.velocity.x * boid.speedWithSize < -5 && this.scale.x < 1)) {
+						// this.scale.x *= -1;
+					// }
+					// if (this.velocity.x * boid.speedWithSize < -1) {
+					// 	this.scale.x = this.initialScale;
+					// } else if (this.velocity.x * boid.speedWithSize > 1) {
+					// 	this.scale.x = -this.initialScale;
+					// }
 				}
 
 				boid.rumble = function ()
@@ -87,8 +97,10 @@
 				this.vectorNear.x = this.vectorNear.y = 0
 				this.vectorGlobal.x = this.vectorGlobal.y = 0
 				this.vectorAvoid.x = this.vectorAvoid.y = 0
-				this.vectorTarget.x = boid.target.x - boid.x
-				this.vectorTarget.y = boid.target.y - boid.y
+				// this.vectorTarget.x = boid.target.x - boid.x
+				// this.vectorTarget.y = boid.target.y - boid.y
+				this.vectorTarget.x = Mouse.x - boid.x
+				this.vectorTarget.y = Mouse.y - boid.y
 
 				var globalCount = 0
 				var nearCount = 0

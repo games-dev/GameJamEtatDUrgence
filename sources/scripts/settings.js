@@ -8,8 +8,8 @@ Settings.MAX_BUBBLE = 16
 Settings.COLORNESS_SPEED = 0.05
 
 // Boid ratio rules
-Settings.DEFAULT_TARGET_SCALE = 0.1
-Settings.DEFAULT_AVOID_SCALE = 0.7
+Settings.DEFAULT_TARGET_SCALE = 0.05
+Settings.DEFAULT_AVOID_SCALE = 2
 Settings.DEFAULT_GLOBAL_SCALE = 0.0001
 Settings.DEFAULT_NEAR_SCALE = 0.0001
 
@@ -50,3 +50,20 @@ Settings.defaultSpawnDelay = 10
 
 Settings.defaultVolumeSound = 0.5
 Settings.defaultVolumeMusic = 0.25
+
+Settings.characterNames = ['Lou', 'Toto', 'Tom', 'Lucie',
+'Hely', 'Raoul', 'Chou', 'Poupou', 'Mya', 'Bea', 'Nini',
+'Foufou', 'Lili'
+]
+
+Settings.currentCharacter = 0
+Settings.GetRandomCharacter = function ()
+{
+	if (Settings.currentCharacter >= Settings.characterNames.length) {
+		Tool.shuffle(Settings.characterNames)
+		Settings.currentCharacter = 0
+	}
+	var character = Settings.characterNames[Settings.currentCharacter]
+	++Settings.currentCharacter
+	return character
+}

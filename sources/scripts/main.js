@@ -15,13 +15,21 @@ window.onload = function ()
 	background.endFill();
 	stage.addChild(background);
 
-	init();
+	var assetToLoad = [ '../images/characters.png', '../images/characters.json' ]
+	for (var i = 0; i < assetToLoad.length; ++i) { PIXI.loader.add(assetToLoad[i]) }
+	PIXI.loader.once('complete', init).load();
 }
 
 function init () 
 {
 	timeStart = new Date() / 1000.0;
 	timeElapsed = 0;
+
+  stage.interactive = true
+  stage.on('mousedown', Mouse.onClic).on('touchstart', Mouse.onClic)
+  stage.on('mousemove', Mouse.onMove).on('touchmove', Mouse.onMove)
+  document.addEventListener('keydown', Keyboard.onKeyDown)
+  document.addEventListener('keyup', Keyboard.onKeyUp)
 
 	engine = new Engine();
 	engine.init();
