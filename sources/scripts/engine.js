@@ -23,21 +23,22 @@
 			for (var i = 0; i < 50; i++)
 			{
 				var boid = PIXI.Sprite.fromImage('../images/toto.png');
+				var seed = Math.random();
 
 				boid.anchor.set(0.5, 1)
-				boid.scale.set(0.25)
-				boid.size = 64
+				boid.scale.set(0.25 + 0.25 * seed)
+				boid.size = (0.5 + 0.5 * seed) * 96
 				boid.target = Tool.vec2(window.innerWidth / 2, window.innerHeight / 2)
 
 				var velocityAngle = Math.random() * Math.PI * 2
 				boid.velocity = Tool.vec2(Math.cos(velocityAngle), Math.sin(velocityAngle))
 
 				boid.speed = Settings.DEFAULT_SPEED
-				boid.friction = Settings.DEFAULT_FRICTION
+				boid.friction = Settings.DEFAULT_FRICTION + Math.random() * 0.05
 				boid.frictionCollision = Settings.DEFAULT_FRICTION_COLLISION
 
-				boid.targetScale = Settings.DEFAULT_TARGET_SCALE
-				boid.avoidScale = Settings.DEFAULT_AVOID_SCALE
+				boid.targetScale = Settings.DEFAULT_TARGET_SCALE + Math.random() * 0.1
+				boid.avoidScale = Settings.DEFAULT_AVOID_SCALE + Math.random() * 1
 				boid.nearScale = Settings.DEFAULT_NEAR_SCALE
 				boid.globalScale = Settings.DEFAULT_GLOBAL_SCALE
 
@@ -67,6 +68,14 @@
 				this.boidList.push(boid);
 				this.particleContainer.addChild(boid);
 			}
+		}
+
+		function depthCompare(a, b) {  
+			if (a.y < b.y)
+				return -1;
+			if (a.y > b.y)
+				return 1;
+			return 0;
 		}
 
 		this.update = function ()
@@ -133,5 +142,7 @@
 					this.vectorTarget.x + this.vectorNear.x + this.vectorGlobal.x + this.vectorAvoid.x,
 					this.vectorTarget.y + this.vectorNear.y + this.vectorGlobal.y + this.vectorAvoid.y)
 			}
+
+			this.particleContainer.children.sort(depthCompare);
 		}
 	}
