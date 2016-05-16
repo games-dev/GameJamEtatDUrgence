@@ -20,16 +20,18 @@
 			this.vectorTarget = Tool.vec2(0,0);
 
 
-			for (var i = 0; i < 200; i++)
+			for (var i = 0; i < 60; i++)
 			{
 				var boid = PIXI.Sprite.fromFrame(Settings.GetRandomCharacter());
 				var seed = Math.random();
 
+				boid.position.set(window.innerWidth / 2, window.innerHeight / 2);
 				boid.anchor.set(0.5, 1)
 				boid.scale.set(0.2 + 0.1 * seed)
 				boid.initialScale = boid.scale.x
 				boid.size = (0.5 + 0.5 * seed) * 32
 				boid.target = Tool.vec2(window.innerWidth / 2, window.innerHeight / 2)
+				// boid.target = Tool.vec2(Math.random() * window.innerWidth, Math.random() * window.innerHeight)
 
 				var velocityAngle = Math.random() * Math.PI * 2
 				boid.velocity = Tool.vec2(Math.cos(velocityAngle), Math.sin(velocityAngle))
@@ -66,6 +68,8 @@
 					// } else if (this.velocity.x * boid.speedWithSize > 1) {
 					// 	this.scale.x = -this.initialScale;
 					// }
+
+					this.rotation = Math.atan2(this.target.y - this.y, this.target.x - this.x) - Tool.PIHalf;
 				}
 
 				boid.rumble = function ()
@@ -81,11 +85,10 @@
 		}
 
 		function depthCompare(a, b) {  
-			if (a.y < b.y)
+			if (Tool.distanceVec(a, a.target) > Tool.distanceVec(b, b.target))
 				return -1;
-			if (a.y > b.y)
+			else
 				return 1;
-			return 0;
 		}
 
 		this.update = function ()
@@ -97,10 +100,10 @@
 				this.vectorNear.x = this.vectorNear.y = 0
 				this.vectorGlobal.x = this.vectorGlobal.y = 0
 				this.vectorAvoid.x = this.vectorAvoid.y = 0
-				// this.vectorTarget.x = boid.target.x - boid.x
-				// this.vectorTarget.y = boid.target.y - boid.y
-				this.vectorTarget.x = Mouse.x - boid.x
-				this.vectorTarget.y = Mouse.y - boid.y
+				this.vectorTarget.x = boid.target.x - boid.x
+				this.vectorTarget.y = boid.target.y - boid.y
+				// this.vectorTarget.x = Mouse.x - boid.x
+				// this.vectorTarget.y = Mouse.y - boid.y
 
 				var globalCount = 0
 				var nearCount = 0
