@@ -39,3 +39,7 @@ Tool.shuffle = function(array) {
   }
   return array;
 }
+
+Tool.GetCenter = function () {
+  return Tool.vec2(window.innerWidth / 2, window.innerHeight / 2);
+}

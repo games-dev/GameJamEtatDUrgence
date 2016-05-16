@@ -3,11 +3,13 @@
 	{
 		this.particleContainer;
 		this.boidList;
+		this.player;
 
 		this.vectorNear;
 		this.vectorAvoid;
 		this.vectorGlobal;
 		this.vectorTarget;
+		this.vectorKeyboard;
 
 		this.init = function ()
 		{
@@ -18,70 +20,22 @@
 			this.vectorAvoid = Tool.vec2(0,0);
 			this.vectorGlobal = Tool.vec2(0,0);
 			this.vectorTarget = Tool.vec2(0,0);
+			this.vectorKeyboard = Tool.vec2(0,0);
 
-
-			for (var i = 0; i < 60; i++)
+			for (var i = 0; i < 100; i++)
 			{
-				var boid = PIXI.Sprite.fromFrame(Settings.GetRandomCharacter());
-				var seed = Math.random();
-
-				boid.position.set(window.innerWidth / 2, window.innerHeight / 2);
-				boid.anchor.set(0.5, 1)
-				boid.scale.set(0.2 + 0.1 * seed)
-				boid.initialScale = boid.scale.x
-				boid.size = (0.5 + 0.5 * seed) * 32
-				boid.target = Tool.vec2(window.innerWidth / 2, window.innerHeight / 2)
-				// boid.target = Tool.vec2(Math.random() * window.innerWidth, Math.random() * window.innerHeight)
-
-				var velocityAngle = Math.random() * Math.PI * 2
-				boid.velocity = Tool.vec2(Math.cos(velocityAngle), Math.sin(velocityAngle))
-
-				boid.speed = Settings.DEFAULT_SPEED
-				boid.friction = Settings.DEFAULT_FRICTION + Math.random() * 0.05
-				boid.frictionCollision = Settings.DEFAULT_FRICTION_COLLISION
-
-				boid.targetScale = Settings.DEFAULT_TARGET_SCALE// + Math.random() * 0.1
-				boid.avoidScale = Settings.DEFAULT_AVOID_SCALE// + Math.random() * 1
-				boid.nearScale = Settings.DEFAULT_NEAR_SCALE
-				boid.globalScale = Settings.DEFAULT_GLOBAL_SCALE
-
-				boid.index = i;
-
-				boid.speedWithSize = boid.speed / Math.max(1, boid.size);
-
-				boid.move = function(moveX, moveY)
-				{
-					this.velocity.x += moveX
-					this.velocity.y += moveY
-
-					this.x += this.velocity.x * boid.speedWithSize
-					this.y += this.velocity.y * boid.speedWithSize
-
-					this.velocity.x *= this.friction
-					this.velocity.y *= this.friction
-
-					// if ((this.velocity.x * boid.speedWithSize > 5 && this.scale.x > 1)  || (this.velocity.x * boid.speedWithSize < -5 && this.scale.x < 1)) {
-						// this.scale.x *= -1;
-					// }
-					// if (this.velocity.x * boid.speedWithSize < -1) {
-					// 	this.scale.x = this.initialScale;
-					// } else if (this.velocity.x * boid.speedWithSize > 1) {
-					// 	this.scale.x = -this.initialScale;
-					// }
-
-					this.rotation = Math.atan2(this.target.y - this.y, this.target.x - this.x) - Tool.PIHalf;
-				}
-
-				boid.rumble = function ()
-				{
-					var randomAngle = Math.random() * Math.PI * 2
-					this.velocity.x += Math.cos(randomAngle)
-					this.velocity.y += Math.sin(randomAngle)
-				}
-
+				var boid = Boid.GetNewInstance();
 				this.boidList.push(boid);
 				this.particleContainer.addChild(boid);
 			}
+
+			this.player = Boid.GetNewInstance('Nini');
+			this.player.isPlayer = true;
+			this.player.anchor.y = 0.75
+			this.player.position.set(Tool.GetCenter().x, Tool.GetCenter().y);
+
+			this.boidList.push(this.player);
+			this.particleContainer.addChild(this.player);
 		}
 
 		function depthCompare(a, b) {  
@@ -93,9 +47,27 @@
 
 		this.update = function ()
 		{
+			this.vectorKeyboard.x = this.vectorKeyboard.y = 0
+
+			if (Keyboard.A.down || Keyboard.Q.down) {
+				this.vectorKeyboard.x = 1
+			} else if (Keyboard.D.down) {
+				this.vectorKeyboard.x = -1
+			}
+
+			if (Keyboard.W.down || Keyboard.Z.down) {
+				this.vectorKeyboard.y = 1
+			} else if (Keyboard.S.down) {
+				this.vectorKeyboard.y = -1
+			}
+
 			for (var current = 0; current < this.boidList.length; ++current)
 			{
 				var boid = this.boidList[current]
+
+				if (boid.isPlayer) {
+					continue;
+				}
 
 				this.vectorNear.x = this.vectorNear.y = 0
 				this.vectorGlobal.x = this.vectorGlobal.y = 0
@@ -151,11 +123,13 @@
 				this.vectorAvoid.y *= boid.avoidScale
 				this.vectorTarget.x *= boid.targetScale
 				this.vectorTarget.y *= boid.targetScale
+				this.vectorKeyboard.x *= boid.keyboardScale
+				this.vectorKeyboard.y *= boid.keyboardScale
 
 				// Apply to Boid
 				boid.move(
-					this.vectorTarget.x + this.vectorNear.x + this.vectorGlobal.x + this.vectorAvoid.x,
-					this.vectorTarget.y + this.vectorNear.y + this.vectorGlobal.y + this.vectorAvoid.y)
+					this.vectorTarget.x + this.vectorNear.x + this.vectorGlobal.x + this.vectorAvoid.x + this.vectorKeyboard.x,
+					this.vectorTarget.y + this.vectorNear.y + this.vectorGlobal.y + this.vectorAvoid.y + this.vectorKeyboard.y)
 			}
 
 			this.particleContainer.children.sort(depthCompare);

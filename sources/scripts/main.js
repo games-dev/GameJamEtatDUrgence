@@ -13,6 +13,9 @@ window.onload = function ()
 	background.beginFill(0x000000, 1);
 	background.drawRect(0, 0, width, height);
 	background.endFill();
+	// background.beginFill(0xA4C94A, 1);
+	// background.drawCircle(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 4);
+	// background.endFill();
 	stage.addChild(background);
 
 	var assetToLoad = [ '../images/characters.png', '../images/characters.json' ]
